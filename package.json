@@ -1,0 +1,14 @@
+{
+  "name": "jazl-server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "aonemd <aonemdsaleh@gmail.com>",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "express": "^4.16.3"
+  },
+  "scripts": {
+    "serve": "node index.js"
+  }
+}
