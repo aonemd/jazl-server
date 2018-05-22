@@ -44,6 +44,9 @@ query ($owner: String!, $repo: String!, $issue: Int!) {
       repo: repo,
       issue: parseInt(req.params.number)
     }).then(function (result) {
+      res.header("Access-Control-Allow-Origin", "*")
+      res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE")
+      res.header("Access-Control-Allow-Headers", "Content-Type, Authorization")
       res.status(200)
       res.json(result)
     }, function (err) {
