@@ -6,7 +6,8 @@
   "license": "MIT",
   "private": false,
   "dependencies": {
-    "express": "^4.16.3"
+    "express": "^4.16.3",
+    "graphql.js": "^0.4.20"
   },
   "scripts": {
     "serve": "node index.js"
