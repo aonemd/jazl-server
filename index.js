@@ -1,14 +1,21 @@
 const express    = require('express');
-const bodyParser = require('body-parser')
-const jsonParser = bodyParser.json()
-const graphql    = require('graphql.js')
+const request    = require('request');
+const cors       = require('cors')
+const graphql    = require('graphql.js');
+const bodyParser = require('body-parser');
+const jsonParser = bodyParser.json();
 
-const app          = express();
-const access_token = process.env.GH_ACCESS_TOKEN
-const owner        = process.env.OWNER
-const repo         = process.env.REPO
+const app           = express();
+const access_token  = process.env.GH_ACCESS_TOKEN;
+const client_id     = process.env.GH_CLIENT_ID;
+const client_secret = process.env.GH_CLIENT_SECRET;
+const owner         = process.env.OWNER;
+const repo          = process.env.REPO;
 
 app.set('port', (process.env.PORT || 8001));
+
+app.use(cors());
+app.use(bodyParser.json());
 
 app.get('/', (req, res) => res.send('Hello World!'))
 app.get('/issues/:number/comments', (req, res) => {
@@ -57,11 +64,11 @@ query ($owner: String!, $repo: String!, $issue: Int!) {
     });
 })
 
-app.post('/issues/:number/comments', jsonParser, (req, res) => {
+app.post('/issues/:number/comments', (req, res) => {
   let graph = graphql("https://api.github.com/graphql", {
     asJSON: true,
     headers: {
-      "Authorization": `Bearer ${access_token}`,
+      "Authorization": req.headers.authorization,
       "User-Agent": `${repo}`
     }
   })
@@ -110,6 +117,27 @@ app.post('/issues/:number/comments', jsonParser, (req, res) => {
         }
       )
     })
+});
+
+app.post('/access_tokens/fetch', (req, res) => {
+  request.post({
+    url: 'https://github.com/login/oauth/access_token',
+    form: {
+      code: req.body.code,
+      client_id: client_id,
+      client_secret: client_secret
+    },
+    headers: {
+      'Accept': 'application/json',
+      'User-Agent': 'jazl-server',
+    },
+  }, (error, response, body) => {
+    if (!error) {
+      res.json(JSON.parse(body));
+    } else {
+      res.json({ error });
+    }
+  });
 });
 
 app.listen(app.get('port'), () => console.log(`App listening on port ${app.get('port')}`))
